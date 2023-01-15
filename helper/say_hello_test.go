@@ -8,19 +8,73 @@ import (
 	"testing"
 )
 
-func TestTableHellorlf(t *testing.T) {
+func BenchmarkTableHello(b *testing.B) {
+	benchmark := []struct {
+		name     string
+		status   string
+		expected string
+	}{
+		{
+			name:   "John",
+			status: "Active",
+		},
+		{
+			name:   "Denny",
+			status: "Active",
+		},
+	}
+	for _, benchmark := range benchmark {
+		b.Run(benchmark.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				SayHello(benchmark.name, benchmark.status)
+			}
+		})
+	}
+}
+
+func BenchmarkSub(b *testing.B) {
+	b.Run("John", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			SayHello("John", "Active")
+		}
+	})
+	b.Run("Denny", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			SayHello("Denny", "Active")
+		}
+	})
+
+}
+
+func BenchmarkSayHello(b *testing.B) {
+
+	for i := 0; i < b.N; i++ {
+		SayHello("John", "Active")
+	}
+}
+
+func TestTableHello(t *testing.T) {
 	test := []struct {
 		name     string
 		status   string
-		request  string
 		expected string
 	}{
 		{
 			name:     "John",
 			status:   "Active",
-			request:  "Hi Hello John Active",
 			expected: "Hi Hello John Active",
 		},
+		{
+			name:     "Denny",
+			status:   "Active",
+			expected: "Hi Hello Denny Active",
+		},
+	}
+	for _, test := range test {
+		t.Run(test.name, func(t *testing.T) {
+			result := SayHello(test.name, test.status)
+			require.Equal(t, test.expected, result)
+		})
 	}
 }
 
